@@ -14,7 +14,7 @@ import {
   TouchableWithoutFeedback,
   TextInput
 } from "react-native";
-//import console = require('console');
+import {RichTextEditor, RichTextToolbar} from 'react-native-zss-rich-text-editor';
 
 type Props = {};
 export default class NewNote extends Component<Props> {
@@ -44,6 +44,8 @@ export default class NewNote extends Component<Props> {
     this.textBar = this.textBar.bind(this);
     this.inputer = this.inputer.bind(this);
     this.fire = this.fire.bind(this);
+    this.getHTML = this.getHTML.bind(this);
+this.setFocusHandlers = this.setFocusHandlers.bind(this);
     //     this.seeker = this.seeker.bind(this);
   }
   componentDidUpdate() {
@@ -51,6 +53,26 @@ export default class NewNote extends Component<Props> {
       this.TextInput.focus();
     }
   }
+  onEditorInitialized() {
+    this.setFocusHandlers();
+    this.getHTML();
+  }
+
+  async getHTML() {
+    const titleHtml = await this.richtext.getTitleHtml();
+    const contentHtml = await this.richtext.getContentHtml();
+    //alert(titleHtml + ' ' + contentHtml)
+  }
+
+  setFocusHandlers() {
+    this.richtext.setTitleFocusHandler(() => {
+      //alert('title focus');
+    });
+    this.richtext.setContentFocusHandler(() => {
+      //alert('content focus');
+    });
+  }
+
   replaceLast(find, replace, string) {
     var lastIndex = string.lastIndexOf(find);
     if (lastIndex === -1) {
@@ -502,7 +524,8 @@ export default class NewNote extends Component<Props> {
             justifyContent: "space-between",
             alignItems: "center",
             alignSelf: "center",
-            marginTop: 52 + StatusBar.currentHeight
+            marginTop: 52 + StatusBar.currentHeight,
+            marginBottom: 100
           }}
         >
           <TouchableWithoutFeedback
@@ -536,84 +559,21 @@ export default class NewNote extends Component<Props> {
             Add
           </Text>
         </View>
-        <ScrollView
-          contentContainerstyle={{
-            flexGrow: 1
-          }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          automaticallyAdjustContentInsets={false}
-          directionalLockEnabled={true}
-          bounces={false}
-          scrollsToTop={false}
-        >
-          <TextInput
-            underlineColorAndroid={"transparent"}
-            allowFontScaling={false}
-            placeholder="The Title"
-            placeholderStyle={{ fontFamily: "ZillaSlab-Bold", fontSize: 16 }}
-            placeholderTextColor="rgba(0, 0, 0, 0.2)"
-            style={{
-              paddingLeft: 28,
-              width: Dimensions.get("window").width,
-              backgroundColor: "transparent",
-              fontSize: 16,
-              color: "black",
-              fontWeight: "normal",
-              borderTopWidth: 2,
-              borderBottomWidth: 2,
-              borderColor: "black",
-              marginTop: 100,
-              flexDirection: "row",
-              alignItems: "center",
-              fontFamily: "ZillaSlab-Bold"
-            }}
+        <RichTextEditor
+              ref={(r)=>this.richtext = r}
+              style={styles.richText}
+              initialTitleHTML={'Title!!'}
+              setFontFamily={'zsBold'}
+             // customCSS={("fontFamily:'zsBold'")}
+              initialContentHTML={'Hello <b>World</b> <p>this is a new paragraph</p> <p>this is another new paragraph</p>'}
+              editorInitializedCallback={() => this.onEditorInitialized()}
           />
-
-          {pressed ? (
-            <TextInput
-              value={text}
-              onSelectionChange={this.onSelectionChange}
-              onChangeText={text => this.inputer(text)}
-              underlineColorAndroid={"transparent"}
-              placeholder="Your Note..."
-              multiline={true}
-              selectionColor={"yellow"}
-              ref={input => {
-                this.TextInput = input;
-              }}
-              onBlur={() => this.setState({ pressed: false })}
-              placeholderStyle={{ fontSize: 15, fontFamily: "zsMedium" }}
-              placeholderTextColor="rgba(0, 0, 0, 0.2)"
-              style={{
-                paddingLeft: 28,
-                paddingTop: 28,
-                paddingRight: 28,
-                width: "100%",
-                backgroundColor: "transparent",
-                fontSize: 15,
-                fontFamily: "zsMedium",
-                color: "black"
-              }}
-            />
-          ) : (
-            <TouchableWithoutFeedback onPress={this.seeker.bind(this)}>
-              <View
-                style={{
-                  paddingLeft: 28,
-                  paddingTop: 28,
-                  paddingRight: 28,
-                  width: "100%",
-                  backgroundColor: "transparent"
-                }}
-              >
-                {this.textBar()}
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-        </ScrollView>
-        <View
-          style={{
+          <RichTextToolbar
+          
+            getEditor={() => this.richtext}
+/>
+   {/*    <View
+        style={{
             width: Dimensions.get("window").width,
             height: 42,
             borderTopWidth: 2,
@@ -756,7 +716,7 @@ export default class NewNote extends Component<Props> {
               </Text>
             </View>
           </View>
-        </View>
+        </View>*/}
       </View>
     );
   }
@@ -785,7 +745,12 @@ const styles = StyleSheet.create({
     height: 26,
     alignItems: "center",
     justifyContent: "center"
-  }
+  },
+  richText: {
+    alignItems:'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+},
 });
 /*
 <View style={{height: 56, width: (Dimensions.get('window').width),
