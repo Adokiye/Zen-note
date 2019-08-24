@@ -22,7 +22,7 @@ import {
 const Screens = createStackNavigator({
  
   Home: {
-      screen: NewNote,
+      screen: Home,
   },
   NewNote: {
     screen: NewNote,
