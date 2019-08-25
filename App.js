@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Home from './components/Home';
 import NewNote from './components/NewNote';
+import Gallery from './components/Gallery';
 import {
   createStackNavigator,
   createAppContainer, DrawerNavigator, DrawerItems
@@ -22,11 +23,14 @@ import {
 const Screens = createStackNavigator({
  
   Home: {
-      screen: Home,
+      screen: Gallery,
   },
   NewNote: {
     screen: NewNote,
   },
+  Gallery: {
+    screen: Gallery,
+  }
 });
 Screens.navigationOptions = {
   // Hide the header from AppNavigator stack
