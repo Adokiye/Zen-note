@@ -30,6 +30,8 @@ export default class Gallery extends Component<Props> {
       lastCursor: null,
       noMorePhotos: false,
       loadingMore: false,
+      new_data: true,
+      count: -1
     };
   }
   tryPhotoLoad() {
@@ -56,28 +58,62 @@ export default class Gallery extends Component<Props> {
   }
   
   appendAssets(data) {
-    console.log("\n"+"\n"+"\n"+JSON.stringify(data)+"\n"+"\n"+"\n")
     const assets = data.edges;
+    let count = this.state.count
+    let photos = this.state.photos;
     const nextState = {
       loadingMore: false,
     };
-  
     if (!data.page_info.has_next_page) {
       nextState.noMorePhotos = true;
     }
-  
     if (assets.length > 0) {
-      this.setState({lastCursor: data.page_info.end_cursor})
-   //   nextState.lastCursor = data.page_info.end_cursor;
+      this.setState({lastCursor: data.page_info.end_cursor, 
+        count: this.state.count + 1}, ()=> console.log(this.state.count))
       let len = assets.length;
-     // console.log(len);
-      for (let i = 0; i < len; i++) {
-        let row = assets[i];
-      //  console.log(row);
-        this.setState(prevState => ({
-          photos: [...prevState.photos, row]
+      if(photos[count]){
+        console.log("true")
+        console.log("\n"+"\n"+"\n"+
+      JSON.stringify(photos[count].node.timestamp)
+      );
+      if(photos[count].node.timestamp == assets[0].node.timestamp){
+        console.log("true")
+      }else{
+        console.log("false")
+         this.setState(prevState => ({
+          photos: [...prevState.photos, assets[0]]
         }));
       }
+      }else{
+        console.log("else")
+        if(photos[count-1]){
+          if(photos[count].node.timestamp == assets[0].node.timestamp){
+            console.log("other true")
+          }else{
+            console.log("other false")
+             this.setState(prevState => ({
+              photos: [...prevState.photos, assets[0]]
+            }));
+          }
+        }else{
+          this.setState(prevState => ({
+          photos: [...prevState.photos, assets[0]]
+        }));
+        }
+          
+        
+        
+      }
+    /*  for (let i = 0; i < len; i++) {
+        let row = assets[i];
+        console.log(row.node.timestamp+"\n"+"\n"+"\n")
+    //    console.log(JSON.stringify(photos)+JSON.stringify(row)+"--photos&row"+"\n"+"\n"+"\n")
+    ///    if(photos[count]){
+    //     if(photos[count].node.timestamp != row.node.timestamp){
+         
+    //    }  
+    //    } 
+      }*/
     }
    //  console.log("\n"+"\n"+"\n"+JSON.stringify(nextState)+"\n"+"\n"+"\n");
     this.setState(nextState);
